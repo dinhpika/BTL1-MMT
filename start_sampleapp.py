@@ -34,6 +34,19 @@ PORT = 8000  # Default port
 
 app = WeApRous()
 
+@app.route('/register', methods=['POST'])
+def register(headers="guest", body="anonymous"):
+    """
+    Handle user registration via POST request.
+
+    This route simulates a registration process and prints the provided headers and body
+    to the console.
+
+    :param headers (str): The request headers or user identifier.
+    :param body (str): The request body or registration payload.
+    """
+    print ("[SampleApp] Registering {} to {}".format(headers, body))
+
 @app.route('/login', methods=['POST'])
 def login(headers="guest", body="anonymous"):
     """
@@ -45,7 +58,7 @@ def login(headers="guest", body="anonymous"):
     :param headers (str): The request headers or user identifier.
     :param body (str): The request body or login payload.
     """
-    print "[SampleApp] Logging in {} to {}".format(headers, body)
+    print ("[SampleApp] Logging in {} to {}".format(headers, body))
 
 @app.route('/hello', methods=['PUT'])
 def hello(headers, body):
@@ -58,7 +71,9 @@ def hello(headers, body):
     :param headers (str): The request headers or user identifier.
     :param body (str): The request body or message payload.
     """
-    print "[SampleApp] ['PUT'] Hello in {} to {}".format(headers, body)
+    print ("[SampleApp] ['PUT'] Hello in {} to {}".format(headers, body))
+
+# --- START THE SERVER ---
 
 if __name__ == "__main__":
     # Parse command-line arguments to configure server IP and port

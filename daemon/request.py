@@ -158,6 +158,7 @@ class Request():
         # TODO prepare the request authentication
         #
 	# self.auth = ...
+        # Bắt đầu TODO
         return
 
 
@@ -166,6 +167,7 @@ class Request():
         # TODO prepare the request authentication
         #
 	# self.auth = ...
+        # Bắt đầu TODO
         return
 
     def prepare_cookies(self, cookies):
