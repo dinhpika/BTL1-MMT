@@ -1,25 +1,98 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hybrid Chat (Task 2)</title>
+    <title>Hybrid Chat</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; display: flex; height: 95vh; background-color: #f4f4f5; margin: 0; }
-        #sidebar { width: 200px; border-right: 1px solid #d4d4d8; padding: 10px; background: #fafafa; display: flex; flex-direction: column; }
-        #main-chat { flex: 1; display: flex; flex-direction: column; background-color: #ffffff; }
-        #chat-window { flex: 1; border-bottom: 1px solid #e4e4e7; padding: 10px; overflow-y: auto; }
-        #input-area { display: flex; padding: 10px; border-top: 1px solid #e4e4e7; background-color: #fafafa; }
-        #message-input { flex: 1; padding: 10px; border: 1px solid #d4d4d8; border-radius: 6px; }
-        #send-button { padding: 10px 15px; margin-left: 10px; background-color: #007aff; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        #send-button:hover { background-color: #0056b3; }
-        #peer-list-container { flex: 1; overflow-y: auto; }
-        #peer-list { list-style: none; padding: 0; margin: 0; }
-        #peer-list li { padding: 8px 4px; border-bottom: 1px solid #e4e4e7; font-size: 0.9em; }
-        .message { margin-bottom: 8px; line-height: 1.4; }
-        .message strong { color: #007aff; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            display: flex;
+            height: 95vh;
+            background-color: #f4f4f5;
+            margin: 0;
+        }
+
+        #sidebar {
+            width: 200px;
+            border-right: 1px solid #d4d4d8;
+            padding: 10px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+        }
+
+        #chat-window {
+            flex: 1;
+            border-bottom: 1px solid #e4e4e7;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        #input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #e4e4e7;
+            background-color: #fafafa;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #d4d4d8;
+            border-radius: 6px;
+        }
+
+        #send-button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+
+        #peer-list-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        #peer-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #peer-list li {
+            padding: 8px 4px;
+            border-bottom: 1px solid #e4e4e7;
+            font-size: 0.9em;
+        }
+
+        .message {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .message strong {
+            color: #007aff;
+        }
     </style>
 </head>
+
 <body>
     <div id="sidebar">
         <h3>Online Peers</h3>
@@ -31,7 +104,8 @@
     </div>
     <div id="main-chat">
         <div id="chat-window">
-            <div class="message"><strong>Hệ thống:</strong> Chào mừng bạn. Vui lòng nhập tên trong hộp thoại bật lên để bắt đầu.</div>
+            <div class="message"><strong>Hệ thống:</strong> Chào mừng bạn. Vui lòng nhập tên trong hộp thoại bật lên để
+                bắt đầu.</div>
         </div>
         <div id="input-area">
             <input type="text" id="message-input" placeholder="Nhập tin nhắn...">
@@ -42,4 +116,5 @@
     <!-- Tải tệp JS sau khi đã tải HTML -->
     <script src="/static/js/chat_client.js"></script>
 </body>
+
 </html>

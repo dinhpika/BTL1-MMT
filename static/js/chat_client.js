@@ -8,61 +8,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const peerListElement = document.getElementById("peer-list");
 
     // --- Cấu hình ---
-    // Giả sử backend WeApRous (start_sampleapp.py) chạy trên cổng 8000
-    // Cổng này PHẢI KHỚP với cổng bạn chạy start_sampleapp.py.
-    const API_BASE_URL = "http://localhost:8000";
+    const API_BASE_URL = "http://localhost:8000"; // Giữ nguyên
     let username = "";
 
     // --- Các hàm trợ giúp ---
 
-    /**
-     * Hiển thị tin nhắn trong cửa sổ chat.
-     * @param {string} user - Người dùng gửi tin nhắn.
-     * @param {string} text - Nội dung tin nhắn.
-     */
     function displayMessage(user, text) {
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message");
-        messageElement.innerHTML = `<strong>${escapeHTML(user)}:</strong> ${escapeHTML(text)}`;
-        chatWindow.appendChild(messageElement);
-        // Tự động cuộn xuống dưới cùng
-        chatWindow.scrollTop = chatWindow.scrollHeight;
+        // ... (Giữ nguyên hàm này)
     }
 
-    /**
-     * Làm sạch HTML để chống tấn công XSS (Cross-Site Scripting).
-     * @param {string} str - Chuỗi thô.
-     * @returns {string} - Chuỗi đã được làm sạch.
-     */
     function escapeHTML(str) {
-        return str.replace(/[&<>"']/g, function (match) {
-            return {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;'
-            }[match];
-        });
+        // ... (Giữ nguyên hàm này)
     }
 
     // --- Định nghĩa các hàm gọi API ---
 
     /**
-     * 1. GỌI API ĐĂNG KÝ (CLIENT -> BACKEND)
-     * Yêu cầu backend *của chính mình* đăng ký peer này với Tracker trung tâm.
+     * 1. GỌI API ĐĂNG KÝ (ĐÃ SỬA)
+     * Thay vì /api/register, gọi /submit-info/ [cite: 258]
      */
     async function registerWithTracker() {
         try {
-            // Gọi đến route /api/register trên start_sampleapp.py
-            const response = await fetch(`${API_BASE_URL}/api/register`, {
+            // SỬA ĐỔI: Thay đổi URL
+            const response = await fetch(`${API_BASE_URL}/submit-info/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: username })
             });
 
             if (!response.ok) {
-                throw new Error("Không thể đăng ký với tracker.");
+                throw new Error("Không thể đăng ký với tracker (submit-info).");
             }
             displayMessage("System", "Đăng ký với tracker thành công.");
         } catch (error) {
@@ -72,20 +47,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * 2. GỌI API GỬI TIN NHẮN (CLIENT -> BACKEND)
-     * Gửi tin nhắn đến backend *của chính mình*. Backend sẽ xử lý việc broadcast P2P.
+     * 2. GỌI API GỬI TIN NHẮN (ĐÃ SỬA)
+     * Thay vì /api/broadcast, gọi /broadcast-peer/ [cite: 261]
      */
     async function sendMessage() {
         const messageText = messageInput.value.trim();
         if (messageText === "") return;
 
-        // Hiển thị tin nhắn của chính mình ngay lập tức (cập nhật lạc quan)
         displayMessage(username, messageText);
-        messageInput.value = ""; // Xóa ô nhập liệu
+        messageInput.value = "";
 
         try {
-            // Gọi đến route /api/broadcast trên start_sampleapp.py
-            await fetch(`${API_BASE_URL}/api/broadcast`, {
+            // SỬA ĐỔI: Thay đổi URL (Thêm dấu / dựa theo PDF [cite: 261])
+            await fetch(`${API_BASE_URL}/broadcast-peer/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: messageText, user: username })
@@ -97,12 +71,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * 3. GỌI API LẤY TIN NHẮN (CLIENT -> BACKEND)
-     * Lấy (poll) tin nhắn mới từ backend *của chính mình* mà backend đã nhận từ các peer *khác*.
+     * 3. GỌI API LẤY TIN NHẮN (!! CẦN CHÚ Ý !!)
+     * * Backend log của bạn KHÔNG CÓ API NÀY.
+     * Bạn phải tự thêm một API (ví dụ: /get-messages/) vào file Python
+     * để xử lý việc lấy tin nhắn đang chờ.
      */
     async function fetchNewMessages() {
         try {
-            // Gọi đến route /api/get-messages trên start_sampleapp.py
+            // CẢNH BÁO: Route này (/api/get-messages) không có trong log backend của bạn.
+            // Bạn cần thêm nó vào Python.
             const response = await fetch(`${API_BASE_URL}/api/get-messages`);
             if (!response.ok) return;
 
@@ -111,29 +88,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 displayMessage(msg.user, msg.message);
             });
         } catch (error) {
-            // Bỏ qua lỗi polling (ví dụ: mạng bị ngắt quãng)
-            // console.warn("Lỗi polling:", error);
+            // Bỏ qua lỗi polling
         }
     }
 
     /**
-     * 4. GỌI API LẤY DANH SÁCH PEER (CLIENT -> BACKEND)
-     * Lấy (poll) danh sách peer đang hoạt động từ backend *của chính mình*.
+     * 4. GỌI API LẤY DANH SÁCH PEER (ĐÃ SỬA)
+     * Thay vì /api/get-peers, gọi /get-list/ [cite: 259]
      */
     async function updatePeerList() {
         try {
-            // Gọi đến route /api/get-peers trên start_sampleapp.py
-            const response = await fetch(`${API_BASE_URL}/api/get-peers`);
+            // SỬA ĐỔI: Thay đổi URL
+            const response = await fetch(`${API_BASE_URL}/get-list/`);
             if (!response.ok) return;
 
-            const peers = await response.json(); // Mong đợi một object như { "user1": {...}, "user2": {...} }
+            const peers = await response.json();
+            peerListElement.innerHTML = "";
 
-            peerListElement.innerHTML = ""; // Xóa danh sách cũ
-            // Chúng ta chỉ cần tên (các key)
             Object.keys(peers).forEach(peerUsername => {
                 const li = document.createElement("li");
                 li.textContent = escapeHTML(peerUsername);
-                // Không liệt kê chính mình
                 if (peerUsername === username) {
                     li.textContent += " (Bạn)";
                 }
@@ -141,39 +115,39 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         } catch (error) {
             // Bỏ qua lỗi polling
-            // console.warn("Lỗi lấy danh sách peer:", error);
         }
     }
 
 
     // --- GẮN KẾT SỰ KIỆN VÀ KHỞI TẠO ---
 
-    // Gắn sự kiện cho nút Gửi
     sendButton.addEventListener("click", sendMessage);
-
-    // Gắn sự kiện nhấn phím Enter trong ô nhập liệu
     messageInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
             sendMessage();
         }
     });
 
-    // Hàm khởi tạo
+    // Hàm khởi tạo (Đã sửa để dùng localStorage từ login.html)
     async function initialize() {
-        // 1. Lấy tên người dùng
-        username = prompt("Nhập tên của bạn:", "User" + Math.floor(Math.random() * 1000));
+        // 1. Lấy tên người dùng TỪ LOCALSTORAGE
+        username = localStorage.getItem("username");
+
         if (!username) {
-            username = "Anonymous";
+            alert("Bạn phải đăng nhập để chat!");
+            window.location.href = "login.html";
+            return;
         }
+
         document.title = `${username} - Hybrid Chat`;
         displayMessage("System", `Chào mừng, ${username}!`);
 
-        // 2. Đăng ký với tracker (thông qua backend của chúng ta)
+        // 2. Đăng ký với tracker (đã sửa URL)
         await registerWithTracker();
 
-        // 3. Bắt đầu polling (lấy thông tin định kỳ)
-        setInterval(fetchNewMessages, 1000); // Lấy tin nhắn mới mỗi 1 giây
-        setInterval(updatePeerList, 5000);   // Cập nhật danh sách peer mỗi 5 giây
+        // 3. Bắt đầu polling
+        setInterval(fetchNewMessages, 1000);
+        setInterval(updatePeerList, 5000);
     }
 
     // Chạy ứng dụng
