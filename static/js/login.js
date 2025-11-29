@@ -1,39 +1,46 @@
-// login.js
-document.addEventListener("DOMContentLoaded", () => {
-    const loginButton = document.getElementById("login-button");
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    const API_BASE_URL = "http://localhost:8000";
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
 
-    loginButton.addEventListener("click", async () => {
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
+    errorMessage.textContent = '';
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username, password: password })
-            });
+    // Kiểm tra nhanh phía client
+    if (username !== 'admin' || password !== 'password') {
+        errorMessage.textContent = 'Tên đăng nhập hoặc mật khẩu không đúng!';
+        return;
+    }
 
-            if (response.ok) { // 200 OK
-                const data = await response.json();
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password })
+        });
 
-                // !! QUAN TRỌNG: Lưu tên người dùng vào bộ nhớ trình duyệt
-                localStorage.setItem("username", data.username);
+        const data = await response.json();
 
-                alert("Đăng nhập thành công!");
-                // Chuyển hướng về trang chủ
-                window.location.href = "index.html";
-            } else {
-                // Xử lý lỗi (ví dụ: 401 Unauthorized)
-                const data = await response.json();
-                alert(`Đăng nhập thất bại: ${data.message || 'Sai tên đăng nhập hoặc mật khẩu'}`);
-            }
-        } catch (error) {
-            console.error("Lỗi đăng nhập:", error);
-            alert("Không thể kết nối đến máy chủ. Vui lòng thử lại sau.");
+        if (response.ok) {
+            // Lưu thông tin đăng nhập
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('username', username);
+
+            // Chuyển hướng đến trang chat
+            window.location.href = '/chat.html';
+        } else {
+            errorMessage.textContent = data.error || 'Đăng nhập thất bại';
         }
-    });
+    } catch (error) {
+        console.error('Error:', error);
+        errorMessage.textContent = 'Lỗi kết nối đến server. Vui lòng kiểm tra lại!';
+    }
 });
+
+// Kiểm tra nếu đã đăng nhập
+if (localStorage.getItem('token')) {
+    window.location.href = '/chat.html';
+}
